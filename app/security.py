@@ -46,7 +46,7 @@ def resolve_token(token: str, db: Session) -> User | None:
 
 
 def bootstrap_admin(db: Session) -> None:
-    username, password = settings.bootstrap_admin_username.strip(), settings.bootstrap_admin_password
+    username, password = settings.bootstrap_admin_username.strip().lower(), settings.bootstrap_admin_password
     if not username or not password:
         return
     if len(password) < 12:

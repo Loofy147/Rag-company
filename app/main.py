@@ -50,6 +50,11 @@ class UserCreate(BaseModel):
     role: Literal["admin", "contributor", "reader"] = "reader"
     groups: list[str] = Field(default_factory=list, max_length=50)
 
+    @field_validator("username")
+    @classmethod
+    def normalize_username(cls, username: str) -> str:
+        return username.lower()
+
     @field_validator("groups")
     @classmethod
     def clean_groups(cls, groups: list[str]) -> list[str]:

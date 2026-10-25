@@ -9,6 +9,7 @@ from sqlalchemy import (
     Computed,
     DateTime,
     ForeignKey,
+    func,
     Index,
     Integer,
     String,
@@ -39,6 +40,9 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True, server_default="true")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
     owned_documents: Mapped[list[Document]] = relationship(back_populates="owner", passive_deletes=True)
+
+
+Index("uq_users_username_lower", func.lower(User.username), unique=True)
 
 
 class Document(Base):
