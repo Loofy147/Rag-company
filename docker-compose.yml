@@ -3,11 +3,15 @@ services:
     image: pgvector/pgvector:pg16
     environment:
       POSTGRES_DB: rag
-      POSTGRES_USER: rag
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
-    volumes: ["postgres-data:/var/lib/postgresql/data"]
+      POSTGRES_USER: rag_admin
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD:?Set DB_ADMIN_PASSWORD in .env}
+      RAG_DB_USER: ${RAG_DB_USER:-rag_app}
+      RAG_DB_PASSWORD: ${RAG_DB_PASSWORD:?Set RAG_DB_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init/01-create-app-role.sh:/docker-entrypoint-initdb.d/01-create-app-role.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      test: ["CMD-SHELL", "pg_isready -U rag_admin -d rag"]
       interval: 5s
       timeout: 3s
       retries: 30
@@ -20,7 +24,6 @@ services:
     networks: [rag-internal]
   api:
     build: .
-    env_file: .env
     environment:
       DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}

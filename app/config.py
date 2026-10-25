@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
-    database_url: str = "postgresql+psycopg://rag:change-me@db:5432/rag"
+    database_url: str = "postgresql+psycopg://rag_app:change-me@db:5432/rag"
     jwt_secret: str = ""
     jwt_issuer: str = "vaultrag-local"
     jwt_ttl_minutes: int = 30
