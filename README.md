@@ -17,7 +17,7 @@ A local-first private knowledge workspace for internal documents. It combines Do
 ## Local setup
 Copy .env.example to .env. Generate separate URL-safe secrets with `openssl rand -hex 32` for `DB_ADMIN_PASSWORD`, `RAG_DB_PASSWORD` and `JWT_SECRET`. Keep the password in `DATABASE_URL` identical to `RAG_DB_PASSWORD`. `DB_ADMIN_PASSWORD` is used only by PostgreSQL initialization and is not passed to the API container. The bootstrap admin password must be unique and at least 12 characters. Before loading private documents, temporarily enable the bootstrap network, pull the configured Ollama models and exercise each required file type using synthetic files. Stop the bootstrap stack and restart with the normal compose file. Open http://127.0.0.1:8080.
 
-The bootstrap network is for provisioning only. Prove that chat and ingestion continue working with outbound egress denied before importing confidential documents.
+The bootstrap network is for provisioning only. The PostgreSQL init script creates the `rag_app` runtime role and runs only when the database volume is first initialized. The API is not given the `rag_admin` secret. If initialization fails on a disposable new volume, correct the configuration before retrying; do not delete a volume that contains data. Prove that chat and ingestion work with outbound egress denied before importing confidential documents.
 
 ## Development checks
 Install requirements-dev.txt and run Python compilation, Ruff and pytest. Unit tests cover pure helper behavior; they do not establish live PostgreSQL authorization, Ollama/Docling correctness, browser behavior or network isolation.
