@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 from bs4 import BeautifulSoup
-from docling.document_converter import DocumentConverter
 
 from app.config import settings
 from app.core import chunk_markdown, sanitize_markdown_resource_targets
@@ -44,6 +43,8 @@ def parse_document(filename: str, data: bytes) -> list[dict[str, Any]]:
     if not data:
         raise IngestionError("empty_file")
     try:
+        from docling.document_converter import DocumentConverter
+
         with tempfile.TemporaryDirectory(prefix="vaultrag-") as directory:
             path = Path(directory) / ("input" + suffix)
             path.write_bytes(data)
