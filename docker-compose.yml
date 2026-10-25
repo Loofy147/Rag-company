@@ -1,0 +1,54 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: rag
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+    networks: [rag-internal]
+  ollama:
+    image: ollama/ollama:latest
+    volumes: ["ollama-data:/root/.ollama"]
+    restart: unless-stopped
+    networks: [rag-internal]
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      JWT_ISSUER: ${JWT_ISSUER:-vaultrag-local}
+      BOOTSTRAP_ADMIN_USERNAME: ${BOOTSTRAP_ADMIN_USERNAME:-admin}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:?Set BOOTSTRAP_ADMIN_PASSWORD in .env}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      CHAT_MODEL: ${CHAT_MODEL:-qwen2.5:3b}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nomic-embed-text}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-768}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-20971520}
+      RETRIEVAL_TOP_K: ${RETRIEVAL_TOP_K:-6}
+      RRF_CANDIDATES: ${RRF_CANDIDATES:-24}
+      RRF_K: ${RRF_K:-60}
+      MAX_CHUNK_CHARS: ${MAX_CHUNK_CHARS:-1800}
+      CHUNK_OVERLAP_CHARS: ${CHUNK_OVERLAP_CHARS:-220}
+      ENABLE_API_DOCS: ${ENABLE_API_DOCS:-false}
+    ports: ["127.0.0.1:${APP_PORT:-8080}:8000"]
+    volumes: ["docling-cache:/home/app/.cache"]
+    depends_on:
+      db: {condition: service_healthy}
+      ollama: {condition: service_started}
+    restart: unless-stopped
+    networks: [rag-internal]
+volumes:
+  postgres-data:
+  ollama-data:
+  docling-cache:
+networks:
+  rag-internal:
+    internal: true
