@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import time
 from collections import defaultdict, deque
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
@@ -34,7 +36,25 @@ from app.security import (
 
 STATIC_DIR = Path(__file__).parent / "static"
 bearer = HTTPBearer(auto_error=False)
-app = FastAPI(title="VaultRAG Private Knowledge Workspace", version="0.1.0", docs_url="/docs" if settings.enable_api_docs else None, redoc_url=None, openapi_url="/openapi.json" if settings.enable_api_docs else None)
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    validate_security_settings()
+    initialize_database()
+    with SessionLocal() as db:
+        bootstrap_admin(db)
+    yield
+
+
+app = FastAPI(
+    title="VaultRAG Private Knowledge Workspace",
+    version="0.1.0",
+    lifespan=lifespan,
+    docs_url="/docs" if settings.enable_api_docs else None,
+    redoc_url=None,
+    openapi_url="/openapi.json" if settings.enable_api_docs else None,
+)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 attempts: defaultdict[str, deque[float]] = defaultdict(deque)
 
@@ -112,14 +132,6 @@ def login_limited(key: str) -> bool:
     while window and now - window[0] > 900:
         window.popleft()
     return len(window) >= 8
-
-
-@app.on_event("startup")
-def startup() -> None:
-    validate_security_settings()
-    initialize_database()
-    with SessionLocal() as db:
-        bootstrap_admin(db)
 
 
 @app.middleware("http")
