@@ -26,6 +26,15 @@ settings = Settings()
 
 
 def validate_security_settings() -> None:
+    jwt_secret = settings.jwt_secret.lower()
+    database_url = settings.database_url.lower()
+    bootstrap_password = settings.bootstrap_admin_password.lower()
+    if not settings.jwt_secret or "replace-with" in jwt_secret or "change-me" in jwt_secret or "changeme" in jwt_secret:
+        raise RuntimeError("Replace the example JWT_SECRET before startup.")
+    if not settings.database_url or "replace-with" in database_url or "change-me" in database_url or "changeme" in database_url:
+        raise RuntimeError("Replace the example DATABASE_URL credentials before startup.")
+    if not settings.bootstrap_admin_password or "replace-with" in bootstrap_password or "change-me" in bootstrap_password or "changeme" in bootstrap_password:
+        raise RuntimeError("Replace the example BOOTSTRAP_ADMIN_PASSWORD before startup.")
     if len(settings.jwt_secret.encode("utf-8")) < 32:
         raise RuntimeError("JWT_SECRET must contain at least 32 bytes.")
     if settings.max_upload_bytes < 1024:

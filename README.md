@@ -15,7 +15,7 @@ A local-first private knowledge workspace for internal documents. It combines Do
 - Loopback-bound API and internal runtime network.
 
 ## Local setup
-Copy .env.example to .env. Set a unique database password, a random JWT secret of at least 32 bytes and an admin password of at least 12 characters. Before loading private documents, temporarily enable the bootstrap network, pull the configured Ollama models and exercise each required file type using synthetic files. Stop the bootstrap stack and restart with the normal compose file. Open http://127.0.0.1:8080.
+Copy .env.example to .env. Replace every example placeholder. Set a unique database password, a random JWT secret of at least 32 bytes and an admin password of at least 12 characters. Keep the password embedded in DATABASE_URL identical to DB_PASSWORD. Before loading private documents, temporarily enable the bootstrap network, pull the configured Ollama models and exercise each required file type using synthetic files. Stop the bootstrap stack and restart with the normal compose file. Open http://127.0.0.1:8080.
 
 The bootstrap network is for provisioning only. Prove that chat and ingestion continue working with outbound egress denied before importing confidential documents.
 

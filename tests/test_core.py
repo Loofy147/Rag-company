@@ -1,3 +1,6 @@
+import pytest
+
+from app.config import settings, validate_security_settings
 from app.core import (
     allowed_extension,
     can_share_document,
@@ -61,3 +64,21 @@ def test_markdown_remote_targets_are_removed():
     assert "See policy." in cleaned
     assert "example.invalid" not in cleaned
     assert "alert(1)" not in cleaned
+
+
+def test_security_settings_reject_example_credentials(monkeypatch):
+    monkeypatch.setattr(settings, "jwt_secret", "replace-with-a-random-secret-of-at-least-32-bytes")
+    monkeypatch.setattr(settings, "database_url", "postgresql+psycopg://rag:replace-with-a-long-unique-password@db:5432/rag")
+    monkeypatch.setattr(settings, "bootstrap_admin_password", "replace-with-a-unique-password-of-at-least-12-characters")
+    with pytest.raises(RuntimeError, match="JWT_SECRET"):
+        validate_security_settings()
+
+
+def test_security_settings_accept_explicit_local_values(monkeypatch):
+    monkeypatch.setattr(settings, "jwt_secret", "u" * 48)
+    monkeypatch.setattr(settings, "database_url", "postgresql+psycopg://rag:real-db-secret@db:5432/rag")
+    monkeypatch.setattr(settings, "bootstrap_admin_password", "specific-admin-passphrase-2026")
+    monkeypatch.setattr(settings, "max_upload_bytes", 20 * 1024 * 1024)
+    monkeypatch.setattr(settings, "embedding_dimensions", 768)
+    monkeypatch.setattr(settings, "jwt_ttl_minutes", 30)
+    validate_security_settings()
