@@ -46,7 +46,8 @@ def test_all_substantive_units_need_citations():
 
 
 def test_contributors_cannot_share_outside_assigned_groups():
-    assert can_share_document(user_role="reader", user_groups=[], visibility="private", allowed_groups=[])
+    assert not can_share_document(user_role="reader", user_groups=[], visibility="private", allowed_groups=[])
+    assert can_share_document(user_role="contributor", user_groups=["finance"], visibility="private", allowed_groups=[])
     assert can_share_document(user_role="contributor", user_groups=["finance"], visibility="groups", allowed_groups=["finance"])
     assert not can_share_document(user_role="contributor", user_groups=["finance"], visibility="groups", allowed_groups=["executive"])
     assert not can_share_document(user_role="contributor", user_groups=["finance"], visibility="workspace", allowed_groups=[])
