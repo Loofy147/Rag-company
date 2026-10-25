@@ -24,7 +24,13 @@ from app.db import SessionLocal, engine, get_db, initialize_database
 from app.ingestion import IngestionError, parse_document, sha256_bytes
 from app.models import AuditEvent, Chunk, Document, User
 from app.rag import ModelUnavailable, answer_question, document_visibility_filter, embed_texts
-from app.security import bootstrap_admin, hash_password, issue_access_token, resolve_token, verify_password
+from app.security import (
+    bootstrap_admin,
+    hash_password,
+    issue_access_token,
+    resolve_token,
+    verify_password,
+)
 
 STATIC_DIR = Path(__file__).parent / "static"
 bearer = HTTPBearer(auto_error=False)

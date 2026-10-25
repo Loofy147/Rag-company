@@ -1,4 +1,13 @@
-from app.core import allowed_extension, can_share_document, chunk_markdown, has_complete_citation_coverage, reciprocal_rank_fusion, retain_valid_citations, safe_display_filename, sanitize_markdown_resource_targets
+from app.core import (
+    allowed_extension,
+    can_share_document,
+    chunk_markdown,
+    has_complete_citation_coverage,
+    reciprocal_rank_fusion,
+    retain_valid_citations,
+    safe_display_filename,
+    sanitize_markdown_resource_targets,
+)
 
 
 def test_chunking_preserves_sections():
