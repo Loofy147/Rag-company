@@ -1,0 +1,14 @@
+# Lightweight dependencies for static checks, app import smoke tests and pure unit tests.
+# Full production runtime dependencies, including Docling, are in requirements.txt.
+fastapi>=0.115,<1.0
+SQLAlchemy>=2.0,<3.0
+psycopg[binary]>=3.2,<4.0
+pgvector>=0.4,<1.0
+httpx>=0.28,<1.0
+pydantic-settings>=2.8,<3.0
+python-multipart>=0.0.20,<1.0
+PyJWT>=2.10,<3.0
+pwdlib[argon2]>=0.2.1,<1.0
+beautifulsoup4>=4.12,<5.0
+pytest>=8.3,<9.0
+ruff>=0.11,<1.0

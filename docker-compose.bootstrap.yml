@@ -1,0 +1,5 @@
+# Provisioning only: temporarily allow egress before confidential data exists.
+# Stop this stack and restart with docker-compose.yml alone before importing private documents.
+networks:
+  rag-internal:
+    internal: false

@@ -1,0 +1,38 @@
+name: validate
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-ci.txt
+      - run: python -m compileall -q app tests
+      - run: python -c "import app.main"
+      - run: ruff check app tests
+      - run: python -m pytest -q
+      - name: Check browser JavaScript syntax
+        run: node --check app/static/app.js
+      - name: Check database initialization script syntax
+        run: bash -n init/01-create-app-role.sh
+      - name: Validate Docker Compose configuration
+        run: |
+          cat > .env <<'EOF'
+          DB_ADMIN_PASSWORD=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          RAG_DB_USER=rag_app
+          RAG_DB_PASSWORD=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+          DATABASE_URL=postgresql+psycopg://rag_app:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb@db:5432/rag
+          JWT_SECRET=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          BOOTSTRAP_ADMIN_USERNAME=admin
+          BOOTSTRAP_ADMIN_PASSWORD=CI-test-bootstrap-admin-password-2026
+          EOF
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.yml -f docker-compose.bootstrap.yml config --quiet
