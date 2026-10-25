@@ -9,12 +9,12 @@ from sqlalchemy import (
     Computed,
     DateTime,
     ForeignKey,
-    func,
     Index,
     Integer,
     String,
     Text,
     UniqueConstraint,
+    func,
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TSVECTOR, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship

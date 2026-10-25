@@ -21,6 +21,8 @@ def safe_display_filename(filename: str) -> str:
 
 
 def can_share_document(*, user_role: str, user_groups: list[str], visibility: str, allowed_groups: list[str]) -> bool:
+    if user_role not in {"admin", "contributor"}:
+        return False
     if visibility == "private":
         return True
     if user_role == "admin":
